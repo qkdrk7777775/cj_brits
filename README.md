@@ -23,6 +23,11 @@ The data format is as follows:
     * evals: list, indicating x_t \in R^d (before elimination)
     * eval_masks: list, indicating whether each value is an imputation ground-truth
 
+# Reference link 
+URL : https://github.com/NIPS-BRITS/BRITS/
+URL : https://github.com/caow13/BRITS
+URL : https://github.com/caow13/BRITS
+
 # Data Download Links
 
 * Air Quality Data:
