@@ -30,43 +30,26 @@ class MySet(Dataset):
             rec['is_train'] = 1
         return rec
 
+
 def collate_fn(recs):
-    forward = map(lambda x: x['forward'], recs)
-    backward = map(lambda x: x['backward'], recs)
-    list(map(lambda r:map(lambda x: x['values'],r) ,forward))
-    torch.FloatTensor(forward[0]['values'])
+    forward  = list(map(lambda x: x['forward'], recs))
+    backward = list(map(lambda x: x['backward'], recs))
+    
     def to_tensor_dict(recs):
-#        values = torch.FloatTensor(map(lambda r: map(lambda x: x['values'], r), recs))
-#        masks = torch.FloatTensor(map(lambda r: map(lambda x: x['masks'], r), recs))
-#        deltas = torch.FloatTensor(map(lambda r: map(lambda x: x['deltas'], r), recs))
-#        forwards = torch.FloatTensor(map(lambda r: map(lambda x: x['forwards'], r), recs))#recs=data_iter.dataset.__getitem__(1)
-#
-#        evals = torch.FloatTensor(map(lambda r: map(lambda x: x['evals'], r), recs))
-#        eval_masks = torch.FloatTensor(map(lambda r: map(lambda x: x['eval_masks'], r), recs))
-        
-        values = torch.FloatTensor(list(map(lambda r: r['values'], recs)))
-        masks = torch.FloatTensor(list(map(lambda r: r['masks'],  recs)))
-        deltas = torch.FloatTensor(list(map(lambda r: r['deltas'], recs)))
-        forwards = torch.FloatTensor(list(map(lambda r: r['forwards'],recs)))#recs=data_iter.dataset.__getitem__(1))
-
-        evals = torch.FloatTensor(list(map(lambda r:r['evals'], recs)))
-        eval_masks = torch.FloatTensor(list(map(lambda r: r['eval_masks'], recs)))
-
-        return {'values': values, 'forwards': forwards, 'masks': masks, 'deltas': deltas, 'evals': evals, 'eval_masks': eval_masks}
-
-    ret_dict = {'forward': to_tensor_dict(forward), 'backward': to_tensor_dict(backward)}#
-    
-    
-    np.array(list(map(lambda row:row['values'], forward))).shape
-
-    ret_dict['labels'] = torch.FloatTensor(map(lambda x: x['label'], recs))
-    ret_dict['is_train'] = torch.FloatTensor(map(lambda x: x['is_train'], recs))
-
+        values     =torch.FloatTensor(list(map(lambda r:list(map(lambda x:x['values'],r)), recs)))
+        masks      =torch.FloatTensor(list(map(lambda r:list(map(lambda x:x['masks'], r)), recs)))
+        deltas     =torch.FloatTensor(list(map(lambda r:list(map(lambda x:x['deltas'],r)), recs)))
+        forwards   =torch.FloatTensor(list(map(lambda r:list(map(lambda x:x['forwards'],r)), recs)))
+        evals      =torch.FloatTensor(list(map(lambda r:list(map(lambda x:x['evals'],r)), recs)))
+        eval_masks =torch.FloatTensor(list(map(lambda r:list(map(lambda x:x['eval_masks'],r)), recs)))
+        return {'values':values,'forwards': forwards, 'masks': masks, 'deltas': deltas, 'evals': evals, 'eval_masks': eval_masks} 
+    ret_dict = {'forward': to_tensor_dict(forward), 'backward': to_tensor_dict(backward)}
+    ret_dict['labels']   = torch.FloatTensor(list(map(lambda x: x['label']   , recs)))
+    ret_dict['is_train'] = torch.FloatTensor(list(map(lambda x: x['is_train'], recs)))
     return ret_dict
 
 def get_loader(batch_size = 64, shuffle = True):
-    data_set = MySet()
-    data_iter = DataLoader(dataset = data_set, \
+    data_iter = torch.utils.data.DataLoader(dataset = MySet(), \
                               batch_size = batch_size, \
                               num_workers = 4, \
                               shuffle = shuffle, \
@@ -75,3 +58,10 @@ def get_loader(batch_size = 64, shuffle = True):
     )
 
     return data_iter
+#
+#
+#
+#data_set=data_loader.MySet()
+#data_iter=torch.utils.data.DataLoader(data_set,batch_size=32,collate_fn=collate_fn,shuffle=True,pin_memory=True)
+#for i in data_iter :
+#    break
